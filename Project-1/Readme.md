@@ -1,8 +1,125 @@
 # Steps to deploy project : 
 The steps below based on commercial paper tutorial from <a href=https://hyperledger-fabric.readthedocs.io/en/release-2.3/tutorial/commercial_paper.html>HyperLeger Fabric documentation</a> : 
 
-* copy project p1 directory to /../fabric-samples/commercial-paper/organization/magnetocorp
-* copy project p1 directory to /../fabric-samples/commercial-paper/organization/digibank
+# Setting up Environment 
+## Environment Requirement: 
+* OS - Ubuntu 20.04.2.0 LTS(Focal Fossa) <I>Note: VM is set up either on Virtual Box Locally or on cloud </I>
+* Python 3.8.5 (installed with OS)
+* Docker 20.10.5
+* Docker-Compose 1.25.0
+* Hyper Ledger Fabric 2.3.1 
+* Node.js v10.19.0
+* Npm 6.14.4
+
+### Docker <a href=https://docs.docker.com/engine/install/ubuntu/> Installation</a>: 
+1] Setup Repository 
+```
+ sudo apt-get update
+ sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+```
+2] Add Docker's GPG key
+```
+ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo \
+  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+```
+3] Install Docker Engine, Cli and Runtime
+```
+ sudo apt-get update
+ sudo apt-get install -y  docker-ce docker-ce-cli containerd.io
+
+```
+4] Verify Docker Installation : 
+```
+sudo docker info
+
+Output: 
+thinny81@hyperledgertest1002:/app/fabric-samples/test-network/organizations/cryptogen$ docker info
+Client:
+ Context:    default
+ Debug Mode: false
+ Plugins:
+  app: Docker App (Docker Inc., v0.9.1-beta3)
+  buildx: Build with BuildKit (Docker Inc., v0.5.1-docker)
+
+Server:
+ ...
+
+```
+5] Post-Installation Step to add user to docker group
+```
+sudo groupadd docker
+sudo usermod -aG docker <username>
+
+Note: Logout and login so that the user will be part of updated group
+
+```
+6] Configure Docker to start on boot
+```
+ sudo systemctl enable docker.service
+ sudo systemctl enable containerd.service
+```
+
+### Docker-Compose Installation
+```
+sudo apt-get install -y  git docker-compose
+```
+Run the following command to check the docker-compose version
+```
+sudo docker-compose version
+```
+
+### Hyper Ledger Fabric Installation
+The following script will install : 
+<ol>
+<li>Docker Images & Binaries for Fabric v2.3.1 and Fabric CA v1.4.9</li>
+<li>Hyper Ledger Fabric Sample File</li>
+</ol>
+
+```
+curl -sSL https://bit.ly/2ysbOFE | bash -s
+```
+Reference: 
+
+* https://hyperledger-fabric.readthedocs.io/en/release-2.3/prereqs.html
+* https://hyperledger-fabric.readthedocs.io/en/release-2.3/install.html
+
+### Install Node JS and NPM
+```
+sudo apt-get install -y nodejs npm
+
+node --version
+npm --version
+```
+
+## Commercial Paper Tutorial
+In order to test environment and to understand more about Fabric framework, please follow <a herf=https://hyperledger-fabric.readthedocs.io/en/release-2.3/tutorial/commercial_paper.html> Commercial Paper Tutorial</a>.
+
+<i>Note: Please open different SSH terminial to invoke different roles in the tutorial</i>
+
+Once you are familar with the concept and commands, follow the steps below to continue with the project.
+
+## Project Code Setup
+The main purpose of the project is to write a smart contract for supply chain management that manges assets of home appliances compnay.
+
+Download the codebase and make necessary changes
+```
+git clone https://github.com/vinayachakati1/CSE598project1_spring21 
+```
+ Once chnges are completed, 
+<ol>
+<li> copy project p1 directory to /../fabric-samples/commercial-paper/organization/magnetocorp </li>
+
+<li> copy project p1 directory to /../fabric-samples/commercial-paper/organization/digibank </li>
+</ol>
 
 # Bring up the network : 
 1] run following command to start the network
@@ -139,29 +256,37 @@ aca5e5c30d05   dev-peer0.org2.example.com-cp_0-1f8b85af35cbfdef94bd978f7a1256344
 ```
 
 # Test the functionaliy of ProductContract
-## Create product
-```
-peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"createProductRecord","Args":["2", "Colors", "22", "CD"]}'
+## Instruction to run <code> p1_test.sh</code>
+<code>p1_test.sh</code> contains below <code>peer chaincode invoke</code> commands and you can run the script in <code> /../fabric-samples/commercial-paper/organization/digibank </code>
 
-peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"createProductRecord","Args":["3", "iPhone", "03/29/2021", "mobile"]}'
+## Task 0 - Create Products
 ```
-## Task 2 - Get product by key
-```
-peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"getProductByKey","Args":["2", "Colors"]}'
-```
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"createProductRecord","Args":["213", "Divide", "22", "CD"]}'
 
-##  Task 3 - Update Product quantity
-```
-peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"updateQuantity","Args":["2", "Colors", "22", "400"]}'
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"createProductRecord","Args":["214", "iPad", "03/29/2021", "Tablet"]}'
 
-peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"updateQuantity","Args":["3", "iPhone", "03/21/2021", "1059"]}'
+sleep 30
 ```
 
-## Task 4 - Query by Product Type
+# Task 2 - Get product by key
+```
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"getProductByKey","Args":["213", "Divide"]}'
+
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"getProductByKey","Args":["214", "iPad"]}'
+```
+
+#  Task 3 - Update Product quantity
+```
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"updateQuantity","Args":["213", "Divide", "22", "400"]}'
+
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"updateQuantity","Args":["214", "iPad", "03/21/2021", "1059"]}'
+```
+
+# Task 4 - Query by Product Type
 ```
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByProductType","Args":["CD"]}'
 
-peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByProductType","Args":["mobile"]}'
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByProductType","Args":["Tablet"]}'
 ```
 
 ## Task 5 - Query by Mfg Date
@@ -169,14 +294,14 @@ peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.exa
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByMfgdate","Args":["22"]}'
 
  peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByMfgdate","Args":["03/29/2021"]}'
- ```
+```
 
  ## Task 6 - Query by product type dual
- ```
- peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByProduct_Type_Dual","Args":["CD", "mobile"]}'
+```
+ peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByProduct_Type_Dual","Args":["Tablet", "CD"]}'
 ```
 
  ## Task 7 - Unknown transaction
- ```
- peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByProduct_Type_Dual3333","Args":["CD","mobile"]}'
- ```
+```
+ peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile $ORDERER_CA -C mychannel -n p1 --peerAddresses $CORE_PEER_ADDRESS --tlsRootCertFiles $CORE_PEER_TLS_ROOTCERT_FILE --peerAddresses localhost:9051 --tlsRootCertFiles $PEER0_ORG2_CA --name productcontract -c '{"function":"queryByProduct_Type_Dual3333","Args":["Tablet","CD"]}'
+```
